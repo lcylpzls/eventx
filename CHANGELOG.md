@@ -1,5 +1,20 @@
 # 更新日志
 
+## [v0.2.0] - 2026-08-10
+
+### 新增
+
+- 异步发布：`PublishAsync` 非阻塞入队，worker 池并发消费；
+- 选项：`WithWorkers` / `WithQueueSize` / `WithErrorHandler`；
+- `New` 变更为 `New(opts ...Option) (*Bus, error)`（pre-1.0 破坏性变更）；
+- 优雅关闭：`Close` 排空在途任务后清空订阅（先排空、后清表）；
+- 错误码：`EVENTX_QUEUE_FULL` / `EVENTX_INVALID_OPTION`；
+- 修复：异步入队与关闭之间的竞态（读锁内完成检查与入队）。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.1.0] - 2026-08-10
 
 ### 新增

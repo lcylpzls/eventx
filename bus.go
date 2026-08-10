@@ -35,6 +35,39 @@ type Bus struct {
 	subs   map[string][]*subscription
 	seq    uint64
 	closed bool
+	async  *asyncDispatcher
+}
+
+// Option 修改总线构造配置。
+type Option func(*config)
+
+// config 是总线构造配置。
+type config struct {
+	workers   int
+	queueSize int
+	onError   func(error)
+}
+
+// WithWorkers 设置异步 worker 数（默认 1）。
+func WithWorkers(n int) Option {
+	return func(c *config) {
+		c.workers = n
+	}
+}
+
+// WithQueueSize 设置异步队列容量（默认 1024）。
+func WithQueueSize(n int) Option {
+	return func(c *config) {
+		c.queueSize = n
+	}
+}
+
+// WithErrorHandler 设置异步发布错误回调；
+// 未设置时异步 handler 错误被忽略（建议生产环境设置）。
+func WithErrorHandler(fn func(error)) Option {
+	return func(c *config) {
+		c.onError = fn
+	}
 }
 
 // subscription 是 Subscription 的内部实现。
@@ -46,9 +79,24 @@ type subscription struct {
 	closed  atomic.Bool
 }
 
-// New 创建事件总线。
-func New() *Bus {
-	return &Bus{subs: make(map[string][]*subscription)}
+// New 创建事件总线。选项非法时返回 errx 错误。
+func New(opts ...Option) (*Bus, error) {
+	cfg := config{workers: 1, queueSize: 1024}
+	for _, opt := range opts {
+		if opt != nil {
+			opt(&cfg)
+		}
+	}
+	if cfg.workers < 1 {
+		return nil, errx.NewCodef(CodeInvalidOption, "worker 数必须 >= 1，当前 %d", cfg.workers)
+	}
+	if cfg.queueSize < 1 {
+		return nil, errx.NewCodef(CodeInvalidOption, "队列容量必须 >= 1，当前 %d", cfg.queueSize)
+	}
+	b := &Bus{subs: make(map[string][]*subscription)}
+	b.async = newAsyncDispatcher(cfg)
+	b.async.start(b)
+	return b, nil
 }
 
 // Subscribe 按主题注册订阅，返回订阅句柄。
@@ -101,12 +149,17 @@ func (b *Bus) Publish(ctx context.Context, topic string, payload any) error {
 // 重复关闭幂等。异步在途投递的等待由 v0.2.0 的队列语义补充。
 func (b *Bus) Close() error {
 	b.mu.Lock()
-	defer b.mu.Unlock()
 	if b.closed {
+		b.mu.Unlock()
 		return nil
 	}
 	b.closed = true
+	b.mu.Unlock()
+	// 先排空异步在途任务（订阅表仍完整），再清空订阅。
+	b.async.stopAndWait()
+	b.mu.Lock()
 	b.subs = make(map[string][]*subscription)
+	b.mu.Unlock()
 	return nil
 }
 

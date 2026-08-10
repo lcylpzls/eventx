@@ -11,7 +11,7 @@ import (
 )
 
 func TestPublishBasic(t *testing.T) {
-	bus := New()
+	bus := newBus(t)
 	var got Event
 	sub, err := bus.Subscribe("orders.created", func(ctx context.Context, e Event) error {
 		got = e
@@ -32,7 +32,7 @@ func TestPublishBasic(t *testing.T) {
 }
 
 func TestSubscribeOrder(t *testing.T) {
-	bus := New()
+	bus := newBus(t)
 	var order []string
 	_, _ = bus.Subscribe("t", func(ctx context.Context, e Event) error {
 		order = append(order, "一")
@@ -51,7 +51,7 @@ func TestSubscribeOrder(t *testing.T) {
 }
 
 func TestPublishAggregateErrors(t *testing.T) {
-	bus := New()
+	bus := newBus(t)
 	errA := errors.New("错误A")
 	errB := errors.New("错误B")
 	_, _ = bus.Subscribe("t", func(ctx context.Context, e Event) error {
@@ -70,7 +70,7 @@ func TestPublishAggregateErrors(t *testing.T) {
 }
 
 func TestHandlerPanic(t *testing.T) {
-	bus := New()
+	bus := newBus(t)
 	called := false
 	_, _ = bus.Subscribe("t", func(ctx context.Context, e Event) error {
 		panic("订阅者崩溃")
@@ -87,7 +87,7 @@ func TestHandlerPanic(t *testing.T) {
 }
 
 func TestUnsubscribe(t *testing.T) {
-	bus := New()
+	bus := newBus(t)
 	count := 0
 	sub, _ := bus.Subscribe("t", func(ctx context.Context, e Event) error {
 		count++
@@ -110,21 +110,21 @@ func TestUnsubscribe(t *testing.T) {
 func TestInvalidTopic(t *testing.T) {
 	long := strings.Repeat("a", 257)
 	for _, topic := range []string{"", long, "a\x01b", "orders.*"} {
-		_, err := New().Subscribe(topic, func(ctx context.Context, e Event) error { return nil })
+		_, err := newBus(t).Subscribe(topic, func(ctx context.Context, e Event) error { return nil })
 		assertErrCode(t, err, CodeInvalidTopic)
-		if err := New().Publish(context.Background(), topic, nil); err == nil {
+		if err := newBus(t).Publish(context.Background(), topic, nil); err == nil {
 			t.Fatalf("非法主题 %q 发布应报错", topic)
 		}
 	}
 }
 
 func TestNilHandler(t *testing.T) {
-	_, err := New().Subscribe("t", nil)
+	_, err := newBus(t).Subscribe("t", nil)
 	assertErrCode(t, err, CodeInvalidHandler)
 }
 
 func TestClose(t *testing.T) {
-	bus := New()
+	bus := newBus(t)
 	sub, _ := bus.Subscribe("t", func(ctx context.Context, e Event) error { return nil })
 	if err := bus.Close(); err != nil {
 		t.Fatalf("Close 失败：%v", err)
@@ -141,13 +141,13 @@ func TestClose(t *testing.T) {
 }
 
 func TestPublishNoSubscriber(t *testing.T) {
-	if err := New().Publish(context.Background(), "t", nil); err != nil {
+	if err := newBus(t).Publish(context.Background(), "t", nil); err != nil {
 		t.Fatalf("无订阅者发布应返回 nil：%v", err)
 	}
 }
 
 func TestPublishSkipsUnsubscribedInFlight(t *testing.T) {
-	bus := New()
+	bus := newBus(t)
 	sub := &subscription{
 		id:      1,
 		topic:   "t",
@@ -164,7 +164,7 @@ func TestPublishSkipsUnsubscribedInFlight(t *testing.T) {
 }
 
 func TestConcurrent(t *testing.T) {
-	bus := New()
+	bus := newBus(t)
 	var mu sync.Mutex
 	count := 0
 	sub, _ := bus.Subscribe("t", func(ctx context.Context, e Event) error {
@@ -188,6 +188,15 @@ func TestConcurrent(t *testing.T) {
 	if count != 16*50 {
 		t.Fatalf("订阅计数不匹配：%d", count)
 	}
+}
+
+func newBus(t *testing.T, opts ...Option) *Bus {
+	t.Helper()
+	bus, err := New(opts...)
+	if err != nil {
+		t.Fatalf("New 失败：%v", err)
+	}
+	return bus
 }
 
 func assertErrCode(t *testing.T, err error, want errx.Code) {

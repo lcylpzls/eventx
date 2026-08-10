@@ -14,6 +14,10 @@ const (
 	CodeSubscriptionNotFound errx.Code = "EVENTX_SUBSCRIPTION_NOT_FOUND"
 	// CodeHandlerPanic 订阅处理函数发生未捕获异常。
 	CodeHandlerPanic errx.Code = "EVENTX_HANDLER_PANIC"
+	// CodeQueueFull 异步队列已满。
+	CodeQueueFull errx.Code = "EVENTX_QUEUE_FULL"
+	// CodeInvalidOption 选项参数非法。
+	CodeInvalidOption errx.Code = "EVENTX_INVALID_OPTION"
 )
 
 func init() {
@@ -27,4 +31,8 @@ func init() {
 	errx.RegisterCodeKind(CodeSubscriptionNotFound, errx.KindInvalid)
 	errx.RegisterCode(CodeHandlerPanic, "订阅处理函数发生未捕获异常")
 	errx.RegisterCodeKind(CodeHandlerPanic, errx.KindInternal)
+	errx.RegisterCode(CodeQueueFull, "异步队列已满")
+	errx.RegisterCodeKind(CodeQueueFull, errx.KindQuotaExceeded)
+	errx.RegisterCode(CodeInvalidOption, "选项参数非法")
+	errx.RegisterCodeKind(CodeInvalidOption, errx.KindInvalid)
 }
