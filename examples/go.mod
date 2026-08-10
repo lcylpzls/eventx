@@ -14,7 +14,9 @@ require (
 require (
 	github.com/lcylpzls/cryptox v0.6.7 // indirect
 	github.com/lcylpzls/errx v1.4.0 // indirect
+	github.com/lcylpzls/idgenx v1.3.0 // indirect
 	github.com/lcylpzls/logx v1.2.5 // indirect
+	github.com/lcylpzls/validx v1.2.2 // indirect
 	golang.org/x/crypto v0.54.0 // indirect
 	golang.org/x/sys v0.47.0 // indirect
 )
