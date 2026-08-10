@@ -1,5 +1,12 @@
 # 更新日志
 
+## [v0.7.1] - 2026-08-10
+
+### 新增
+
+- `eventx/adapters/clix`：clix.Observer 适配器，
+  命令生命周期发布为 `clix.command.start` / `clix.command.finish` 事件。
+
 ## [v0.7.0] - 2026-08-10
 
 ### 新增
