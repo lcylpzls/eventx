@@ -45,6 +45,22 @@ func main() {
 - 可选 logx 审计与 Metrics 接口；
 - 并发安全、无全局单例。
 
+## 家族联动（eventx/adapters）
+
+```go
+import (
+	filexadapter "github.com/lcylpzls/eventx/adapters/filex"
+	cachexadapter "github.com/lcylpzls/eventx/adapters/cachex"
+	jobxadapter "github.com/lcylpzls/eventx/adapters/jobx"
+)
+
+store, _ := filex.New(filex.Config{DataDir: "/data", EventHook: filexadapter.Hook(bus)})
+cache, _ := cachex.New(cachex.WithEventHook(cachexadapter.Hook(bus)))
+dispatcher, _ := jobx.NewDispatcher(jobx.WithEventHook(jobxadapter.Hook(bus)))
+```
+
+项目层订阅组装联动；示例见 `examples/ecosystem`。
+
 > 当前状态：**v0.6.x（1.0 候选）**；v1.0.0 是否发布由维护者决定。
 
 ## 文档

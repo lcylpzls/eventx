@@ -1,5 +1,19 @@
 # 更新日志
 
+## [v0.7.0] - 2026-08-10
+
+### 新增
+
+- `eventx/adapters` 子模块（独立发布）：filex / cachex / jobx / dbx
+  官方事件适配器，把各库 EventHook 桥接到总线；
+- 端到端联动示例 examples/ecosystem：filex 上传 → eventx →
+  cachex 失效 + jobx 异步处理；
+- CI/Release 覆盖 adapters 子模块与子模块 tag。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.6.4] - 2026-08-10
 
 ### 变更

@@ -1,5 +1,7 @@
 github.com/lcylpzls/cachex v1.2.0 h1:6ey6/198FaHeAFOqg++MlEa8F2h0RNtnF/LKfbQXzNU=
 github.com/lcylpzls/cachex v1.2.0/go.mod h1:fGJlU7OE/D23JuR75KeEqrplDxqBOA8FPZ41An2dhdA=
+github.com/lcylpzls/dbx v0.5.0 h1:fu/OStmQMZ8yUccIfjRrYIfqXk41n0BUemDbByfxdmU=
+github.com/lcylpzls/dbx v0.5.0/go.mod h1:3oKTLO1gCW7PR6eOUc59RsT0Z1Th/rghrBbe5mTPXrY=
 github.com/lcylpzls/errx v1.4.0 h1:CdlMZuf2F49PCyUkRROf11i1gHcAI38GTG+kxMAGQWI=
 github.com/lcylpzls/errx v1.4.0/go.mod h1:+GcqVS4+6iuHvCELjwpsc1RKrdEtSNz00xq0lFrgdgI=
 github.com/lcylpzls/filex v0.24.0 h1:nZM0hui/VVKTgDl4XQtdek+/TSEKv243V1ZylKnbKuE=
