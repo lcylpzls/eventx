@@ -3,7 +3,7 @@
 进程内事件总线基座：主题发布-订阅（同步/异步）、通配符匹配、
 过滤器与优先级，与 errx / logx / tracex 家族打通。
 
-[![Go Version](https://img.shields.io/badge/Go-%3E%3D1.26-00ADD8?style=flat&logo=go)](https://go.dev/)
+[![Go Version](https://img.shields.io/badge/Go-%3E%3D1.26.5-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![CI](https://github.com/lcylpzls/eventx/actions/workflows/ci.yml/badge.svg)](https://github.com/lcylpzls/eventx/actions/workflows/ci.yml)
 
