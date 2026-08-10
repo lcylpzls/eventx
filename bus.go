@@ -182,6 +182,9 @@ func (b *Bus) Publish(ctx context.Context, topic string, payload any) error {
 	if err := validatePublishTopic(topic); err != nil {
 		return err
 	}
+	if err := ctx.Err(); err != nil {
+		return errx.WrapCode(err, CodeCancelled, "发布上下文已取消")
+	}
 	if b.isClosed() {
 		return errx.NewCode(CodeBusClosed, "总线已关闭")
 	}
@@ -240,6 +243,9 @@ func (b *Bus) isClosed() bool {
 func deliver(b *Bus, ctx context.Context, topic string, payload any, subs []*subscription) error {
 	var errs []error
 	for _, sub := range subs {
+		if err := ctx.Err(); err != nil {
+			return errx.WrapCode(err, CodeCancelled, "发布上下文已取消")
+		}
 		if sub.closed.Load() {
 			continue
 		}

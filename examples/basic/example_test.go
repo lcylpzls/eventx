@@ -39,6 +39,12 @@ func TestExamplePubSub(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SubscribeFiltered 失败：%v", err)
 	}
+	_, err = eventx.SubscribeTyped[int](bus, "orders.count", func(ctx context.Context, topic string, payload int) error {
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("SubscribeTyped 失败：%v", err)
+	}
 	if err := bus.Close(); err != nil {
 		t.Fatalf("Close 失败：%v", err)
 	}

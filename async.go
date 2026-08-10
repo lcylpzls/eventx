@@ -47,6 +47,9 @@ func (b *Bus) PublishAsync(ctx context.Context, topic string, payload any) error
 	if err := validatePublishTopic(topic); err != nil {
 		return err
 	}
+	if err := ctx.Err(); err != nil {
+		return errx.WrapCode(err, CodeCancelled, "发布上下文已取消")
+	}
 	// 在读锁内完成关闭检查与入队：保证要么返回 BusClosed，
 	// 要么任务在 Close 排空之前进入队列。
 	b.mu.RLock()

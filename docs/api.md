@@ -1,8 +1,8 @@
 # API 快照
 
-> 随版本更新。v0.3.0 快照如下；新版本发布后同步替换。
+> 随版本更新。v0.4.0 快照如下；新版本发布后同步替换。
 
-## v0.3.0
+## v0.4.0
 
 ### 类型
 
@@ -53,6 +53,19 @@ func WithPriority(p int) SubscribeOption
   `EVENTX_HANDLER_PANIC`；
 - 执行顺序：优先级升序，同优先级按注册顺序（稳定）。
 
+### 上下文与类型化订阅
+
+```go
+type TypedHandler[T any] func(ctx context.Context, topic string, payload T) error
+func SubscribeTyped[T any](b *Bus, topic string, handler TypedHandler[T]) (Subscription, error)
+```
+
+- 发布入口与分发循环都响应 context 取消：取消时返回
+  `EVENTX_CANCELLED`，剩余订阅者不再执行；
+- `SubscribeTyped` 自动断言载荷类型，不匹配返回
+  `EVENTX_TYPE_MISMATCH`（不影响其他订阅者）；
+- 类型化订阅处理函数为 nil 时返回 `EVENTX_INVALID_HANDLER`。
+
 ### 选项
 
 ```go
@@ -81,3 +94,5 @@ func WithErrorHandler(fn func(error)) Option
 | `EVENTX_HANDLER_PANIC` | internal | 订阅处理函数发生未捕获异常 |
 | `EVENTX_QUEUE_FULL` | quota_exceeded | 异步队列已满 |
 | `EVENTX_INVALID_OPTION` | invalid | 选项参数非法 |
+| `EVENTX_CANCELLED` | cancelled | 发布或分发被上下文取消 |
+| `EVENTX_TYPE_MISMATCH` | invalid | 类型化订阅载荷类型不匹配 |

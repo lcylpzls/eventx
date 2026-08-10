@@ -1,5 +1,19 @@
 # 更新日志
 
+## [v0.4.0] - 2026-08-10
+
+### 新增
+
+- 上下文取消贯穿：Publish / PublishAsync 入口与分发循环响应
+  context 取消，返回 `EVENTX_CANCELLED` 并停止剩余订阅者；
+- 类型化订阅：`SubscribeTyped[T]` 自动断言载荷类型，
+  不匹配返回 `EVENTX_TYPE_MISMATCH`；
+- 错误码：`EVENTX_CANCELLED` / `EVENTX_TYPE_MISMATCH`。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.3.0] - 2026-08-10
 
 ### 新增

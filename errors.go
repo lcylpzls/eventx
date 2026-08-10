@@ -18,6 +18,10 @@ const (
 	CodeQueueFull errx.Code = "EVENTX_QUEUE_FULL"
 	// CodeInvalidOption 选项参数非法。
 	CodeInvalidOption errx.Code = "EVENTX_INVALID_OPTION"
+	// CodeCancelled 发布或分发被上下文取消。
+	CodeCancelled errx.Code = "EVENTX_CANCELLED"
+	// CodeTypeMismatch 类型化订阅载荷类型不匹配。
+	CodeTypeMismatch errx.Code = "EVENTX_TYPE_MISMATCH"
 )
 
 func init() {
@@ -35,4 +39,8 @@ func init() {
 	errx.RegisterCodeKind(CodeQueueFull, errx.KindQuotaExceeded)
 	errx.RegisterCode(CodeInvalidOption, "选项参数非法")
 	errx.RegisterCodeKind(CodeInvalidOption, errx.KindInvalid)
+	errx.RegisterCode(CodeCancelled, "发布或分发被上下文取消")
+	errx.RegisterCodeKind(CodeCancelled, errx.KindCancelled)
+	errx.RegisterCode(CodeTypeMismatch, "类型化订阅载荷类型不匹配")
+	errx.RegisterCodeKind(CodeTypeMismatch, errx.KindInvalid)
 }
