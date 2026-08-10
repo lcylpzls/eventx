@@ -59,6 +59,7 @@ func (b *Bus) PublishAsync(ctx context.Context, topic string, payload any) error
 	}
 	select {
 	case b.async.queue <- asyncTask{ctx: ctx, topic: topic, payload: payload}:
+		b.publishes.Add(1)
 		return nil
 	default:
 		return errx.NewCode(CodeQueueFull, "异步队列已满")

@@ -6,8 +6,10 @@ import (
 	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"github.com/lcylpzls/errx"
+	"github.com/lcylpzls/logx"
 )
 
 // Event 是总线传递的事件。
@@ -58,6 +60,28 @@ type Bus struct {
 	seq    uint64
 	closed bool
 	async  *asyncDispatcher
+
+	logger     logx.Logger
+	publishes  atomic.Uint64
+	deliveries atomic.Uint64
+	failures   atomic.Uint64
+}
+
+// Metrics 是总线运行指标快照。
+type Metrics struct {
+	// Publishes 发布次数（同步分发开始/异步入队成功）。
+	Publishes uint64
+	// Deliveries 投递到订阅处理函数的次数。
+	Deliveries uint64
+	// Failures 订阅处理/过滤器失败次数。
+	Failures uint64
+	// Subscriptions 当前订阅数（精确 + 通配符）。
+	Subscriptions uint64
+}
+
+// MetricProvider 是总线指标接口，供 metricsx 等外部适配。
+type MetricProvider interface {
+	Metrics() Metrics
 }
 
 // subscription 是 Subscription 的内部实现。
@@ -80,6 +104,7 @@ type config struct {
 	workers   int
 	queueSize int
 	onError   func(error)
+	logger    logx.Logger
 }
 
 // WithWorkers 设置异步 worker 数（默认 1）。
@@ -104,6 +129,13 @@ func WithErrorHandler(fn func(error)) Option {
 	}
 }
 
+// WithLogger 注入 logx.Logger，记录事件分发审计（载荷不记录）。
+func WithLogger(logger logx.Logger) Option {
+	return func(c *config) {
+		c.logger = logger
+	}
+}
+
 // New 创建事件总线。选项非法时返回 errx 错误。
 func New(opts ...Option) (*Bus, error) {
 	cfg := config{workers: 1, queueSize: 1024}
@@ -119,6 +151,7 @@ func New(opts ...Option) (*Bus, error) {
 		return nil, errx.NewCodef(CodeInvalidOption, "队列容量必须 >= 1，当前 %d", cfg.queueSize)
 	}
 	b := &Bus{subs: make(map[string][]*subscription)}
+	b.logger = cfg.logger
 	b.async = newAsyncDispatcher(cfg)
 	b.async.start(b)
 	return b, nil
@@ -188,6 +221,7 @@ func (b *Bus) Publish(ctx context.Context, topic string, payload any) error {
 	if b.isClosed() {
 		return errx.NewCode(CodeBusClosed, "总线已关闭")
 	}
+	b.publishes.Add(1)
 	return deliver(b, ctx, topic, payload, b.snapshot(topic))
 }
 
@@ -241,10 +275,13 @@ func (b *Bus) isClosed() bool {
 
 // deliver 按快照顺序执行订阅（过滤器 + handler），聚合错误。
 func deliver(b *Bus, ctx context.Context, topic string, payload any, subs []*subscription) error {
+	start := time.Now()
 	var errs []error
 	for _, sub := range subs {
 		if err := ctx.Err(); err != nil {
-			return errx.WrapCode(err, CodeCancelled, "发布上下文已取消")
+			cancelErr := errx.WrapCode(err, CodeCancelled, "发布上下文已取消")
+			b.logAudit(topic, len(subs), start, cancelErr)
+			return cancelErr
 		}
 		if sub.closed.Load() {
 			continue
@@ -253,6 +290,7 @@ func deliver(b *Bus, ctx context.Context, topic string, payload any, subs []*sub
 		if sub.filter != nil {
 			ok, ferr := applyFilter(sub.filter, ctx, e)
 			if ferr != nil {
+				b.failures.Add(1)
 				errs = append(errs, ferr)
 				continue
 			}
@@ -260,11 +298,44 @@ func deliver(b *Bus, ctx context.Context, topic string, payload any, subs []*sub
 				continue
 			}
 		}
+		b.deliveries.Add(1)
 		if err := invoke(sub.handler, ctx, e); err != nil {
+			b.failures.Add(1)
 			errs = append(errs, err)
 		}
 	}
-	return errx.Join(errs...)
+	err := errx.Join(errs...)
+	b.logAudit(topic, len(subs), start, err)
+	return err
+}
+
+// logAudit 记录分发审计字段（不含载荷）。
+func (b *Bus) logAudit(topic string, subscribers int, start time.Time, err error) {
+	if b.logger == nil {
+		return
+	}
+	b.logger.Debug("事件分发完成", auditFields(topic, subscribers, start, err))
+}
+
+// Metrics 返回总线运行指标快照。
+func (b *Bus) Metrics() Metrics {
+	return Metrics{
+		Publishes:     b.publishes.Load(),
+		Deliveries:    b.deliveries.Load(),
+		Failures:      b.failures.Load(),
+		Subscriptions: b.subscriptionCount(),
+	}
+}
+
+// subscriptionCount 返回当前订阅总数（精确 + 通配符）。
+func (b *Bus) subscriptionCount() uint64 {
+	b.mu.RLock()
+	defer b.mu.RUnlock()
+	var n uint64
+	for _, list := range b.subs {
+		n += uint64(len(list))
+	}
+	return n + uint64(len(b.wild))
 }
 
 // applyFilter 调用过滤器并恢复 panic。

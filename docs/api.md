@@ -1,8 +1,8 @@
 # API 快照
 
-> 随版本更新。v0.4.0 快照如下；新版本发布后同步替换。
+> 随版本更新。v0.5.0 快照如下；新版本发布后同步替换。
 
-## v0.4.0
+## v0.5.0
 
 ### 类型
 
@@ -72,11 +72,28 @@ func SubscribeTyped[T any](b *Bus, topic string, handler TypedHandler[T]) (Subsc
 func WithWorkers(n int) Option
 func WithQueueSize(n int) Option
 func WithErrorHandler(fn func(error)) Option
+func WithLogger(logger logx.Logger) Option
 ```
 
 - worker 数默认 1，队列容量默认 1024；
 - 异步 handler 错误通过 `WithErrorHandler` 回调上报；
 - worker/队列容量非法时 `New` 返回 `EVENTX_INVALID_OPTION`。
+
+### 可观测
+
+```go
+type Metrics struct {
+    Publishes     uint64
+    Deliveries    uint64
+    Failures      uint64
+    Subscriptions uint64
+}
+func (b *Bus) Metrics() Metrics
+```
+
+- `WithLogger` 注入 logx.Logger：分发完成记录
+  topic / subscribers / duration_ms / 错误码，载荷不记录；
+- `Metrics` 返回发布/投递/失败/订阅数快照，供 metricsx 等外部适配。
 
 ### 主题
 

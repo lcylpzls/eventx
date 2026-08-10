@@ -45,6 +45,10 @@ func TestExamplePubSub(t *testing.T) {
 	if err != nil {
 		t.Fatalf("SubscribeTyped 失败：%v", err)
 	}
+	m := bus.Metrics()
+	if m.Publishes == 0 {
+		t.Fatal("指标应记录发布次数")
+	}
 	if err := bus.Close(); err != nil {
 		t.Fatalf("Close 失败：%v", err)
 	}
