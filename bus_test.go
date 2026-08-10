@@ -224,6 +224,22 @@ func TestConcurrent(t *testing.T) {
 	}
 }
 
+func TestZeroValueBus(t *testing.T) {
+	var bus Bus
+	_, err := bus.Subscribe("t", func(ctx context.Context, e Event) error { return nil })
+	assertErrCode(t, err, CodeInvalidOption)
+	err = bus.Publish(context.Background(), "t", nil)
+	assertErrCode(t, err, CodeInvalidOption)
+	err = bus.PublishAsync(context.Background(), "t", nil)
+	assertErrCode(t, err, CodeInvalidOption)
+	err = bus.Close()
+	assertErrCode(t, err, CodeInvalidOption)
+	m := bus.Metrics()
+	if m.Publishes != 0 || m.Subscriptions != 0 {
+		t.Fatalf("零值总线指标应为 0：%+v", m)
+	}
+}
+
 func newBus(t *testing.T, opts ...Option) *Bus {
 	t.Helper()
 	bus, err := New(opts...)

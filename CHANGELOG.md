@@ -1,5 +1,17 @@
 # 更新日志
 
+## [v0.6.2] - 2026-08-10
+
+### 修复
+
+- 零值 Bus（未经 New 构造）的 Subscribe / Publish / PublishAsync /
+  Close 统一返回 `EVENTX_INVALID_OPTION`，不再 panic；
+- Metrics 对零值总线返回全 0 快照。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.6.1] - 2026-08-10
 
 ### 修复

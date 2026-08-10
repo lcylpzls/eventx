@@ -159,6 +159,9 @@ func New(opts ...Option) (*Bus, error) {
 
 // Subscribe 按主题注册订阅（支持 `*` / `**` 通配符）。
 func (b *Bus) Subscribe(topic string, handler Handler) (Subscription, error) {
+	if b == nil || b.async == nil {
+		return nil, errx.NewCode(CodeInvalidOption, "总线未初始化，请使用 New 构造")
+	}
 	return b.subscribe(topic, handler, subscribeConfig{})
 }
 
@@ -212,6 +215,9 @@ func (b *Bus) subscribe(topic string, handler Handler, cfg subscribeConfig) (Sub
 // Publish 同步发布事件：按优先级与注册顺序调用全部匹配 handler，
 // 聚合所有返回的错误（errx.Join）后返回。
 func (b *Bus) Publish(ctx context.Context, topic string, payload any) error {
+	if b == nil || b.async == nil {
+		return errx.NewCode(CodeInvalidOption, "总线未初始化，请使用 New 构造")
+	}
 	ctx = ensureContext(ctx)
 	if err := validatePublishTopic(topic); err != nil {
 		return err
@@ -237,6 +243,9 @@ func ensureContext(ctx context.Context) context.Context {
 // Close 关闭总线：拒绝新发布/订阅，排空异步在途任务后清空订阅。
 // 重复关闭幂等。
 func (b *Bus) Close() error {
+	if b == nil || b.async == nil {
+		return errx.NewCode(CodeInvalidOption, "总线未初始化，请使用 New 构造")
+	}
 	b.mu.Lock()
 	if b.closed {
 		b.mu.Unlock()

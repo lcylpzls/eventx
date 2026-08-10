@@ -44,6 +44,9 @@ func (d *asyncDispatcher) start(b *Bus) {
 // PublishAsync 异步发布事件：投递到队列后立即返回。
 // 队列满时返回 EVENTX_QUEUE_FULL；handler 错误通过 WithErrorHandler 上报。
 func (b *Bus) PublishAsync(ctx context.Context, topic string, payload any) error {
+	if b == nil || b.async == nil {
+		return errx.NewCode(CodeInvalidOption, "总线未初始化，请使用 New 构造")
+	}
 	ctx = ensureContext(ctx)
 	if err := validatePublishTopic(topic); err != nil {
 		return err
