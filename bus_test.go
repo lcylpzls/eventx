@@ -107,11 +107,33 @@ func TestUnsubscribe(t *testing.T) {
 	}
 }
 
+func TestUnsubscribeKeepsOthers(t *testing.T) {
+	bus := newBus(t)
+	count := 0
+	sub1, _ := bus.Subscribe("t", func(ctx context.Context, e Event) error {
+		count++
+		return nil
+	})
+	_, _ = bus.Subscribe("t", func(ctx context.Context, e Event) error {
+		count++
+		return nil
+	})
+	if err := sub1.Unsubscribe(); err != nil {
+		t.Fatalf("Unsubscribe 失败：%v", err)
+	}
+	_ = bus.Publish(context.Background(), "t", nil)
+	if count != 1 {
+		t.Fatalf("取消一个订阅后其余订阅应保留：%d", count)
+	}
+}
+
 func TestInvalidTopic(t *testing.T) {
 	long := strings.Repeat("a", 257)
-	for _, topic := range []string{"", long, "a\x01b", "orders.*"} {
+	for _, topic := range []string{"", long, "a\x01b", "a..b", "a.*b"} {
 		_, err := newBus(t).Subscribe(topic, func(ctx context.Context, e Event) error { return nil })
 		assertErrCode(t, err, CodeInvalidTopic)
+	}
+	for _, topic := range []string{"", long, "a\x01b", "a..b", "orders.*"} {
 		if err := newBus(t).Publish(context.Background(), topic, nil); err == nil {
 			t.Fatalf("非法主题 %q 发布应报错", topic)
 		}

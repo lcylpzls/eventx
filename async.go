@@ -44,7 +44,7 @@ func (d *asyncDispatcher) start(b *Bus) {
 // PublishAsync 异步发布事件：投递到队列后立即返回。
 // 队列满时返回 EVENTX_QUEUE_FULL；handler 错误通过 WithErrorHandler 上报。
 func (b *Bus) PublishAsync(ctx context.Context, topic string, payload any) error {
-	if err := validateTopic(topic); err != nil {
+	if err := validatePublishTopic(topic); err != nil {
 		return err
 	}
 	// 在读锁内完成关闭检查与入队：保证要么返回 BusClosed，
@@ -90,17 +90,7 @@ func (d *asyncDispatcher) run(b *Bus) {
 
 // process 投递单个异步任务并上报错误。
 func (d *asyncDispatcher) process(b *Bus, task asyncTask) {
-	subs := b.snapshot(task.topic)
-	var errs []error
-	for _, sub := range subs {
-		if sub.closed.Load() {
-			continue
-		}
-		if err := invoke(sub.handler, task.ctx, Event{Topic: task.topic, Payload: task.payload}); err != nil {
-			errs = append(errs, err)
-		}
-	}
-	if err := errx.Join(errs...); err != nil && d.onError != nil {
+	if err := deliver(b, task.ctx, task.topic, task.payload, b.snapshot(task.topic)); err != nil && d.onError != nil {
 		d.onError(err)
 	}
 }

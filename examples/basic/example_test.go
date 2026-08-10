@@ -31,6 +31,14 @@ func TestExamplePubSub(t *testing.T) {
 	if err := bus.PublishAsync(context.Background(), "orders.created", "10087"); err != nil {
 		t.Fatalf("PublishAsync 失败：%v", err)
 	}
+	_, err = bus.SubscribeFiltered("orders.*", func(ctx context.Context, e eventx.Event) bool {
+		return e.Payload != nil
+	}, func(ctx context.Context, e eventx.Event) error {
+		return nil
+	})
+	if err != nil {
+		t.Fatalf("SubscribeFiltered 失败：%v", err)
+	}
 	if err := bus.Close(); err != nil {
 		t.Fatalf("Close 失败：%v", err)
 	}

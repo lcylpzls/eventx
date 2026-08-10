@@ -11,6 +11,7 @@ func FuzzTopic(f *testing.F) {
 	f.Add("a.*")
 	f.Add(string(make([]byte, 300)))
 	f.Fuzz(func(t *testing.T, topic string) {
-		_ = validateTopic(topic)
+		_ = validatePublishTopic(topic)
+		_ = validateSubscribeTopic(topic)
 	})
 }
