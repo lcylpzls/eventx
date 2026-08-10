@@ -10,6 +10,7 @@ require (
 	github.com/lcylpzls/eventx v0.7.2
 	github.com/lcylpzls/filex v0.26.0
 	github.com/lcylpzls/jobx v1.3.0
+	github.com/lcylpzls/testx v1.2.3
 )
 
 require (

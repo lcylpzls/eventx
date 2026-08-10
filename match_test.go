@@ -2,6 +2,7 @@ package eventx
 
 import (
 	"context"
+	"github.com/lcylpzls/testx"
 	"strings"
 	"sync"
 	"testing"
@@ -31,9 +32,7 @@ func TestPatternMatch(t *testing.T) {
 	}
 	for _, tt := range tests {
 		got := compilePattern(tt.pattern).matches(tt.topic)
-		if got != tt.want {
-			t.Fatalf("pattern %q match %q = %v，期望 %v", tt.pattern, tt.topic, got, tt.want)
-		}
+		testx.RequireEqual(t, got, tt.want)
 	}
 }
 
@@ -53,9 +52,7 @@ func TestWildcardSubscribe(t *testing.T) {
 	mu.Lock()
 	got := strings.Join(topics, ",")
 	mu.Unlock()
-	if got != "orders.created,orders.updated" {
-		t.Fatalf("通配符订阅命中不匹配：%q", got)
-	}
+	testx.RequireEqual(t, got, "orders.created,orders.updated")
 }
 
 func TestWildcardZeroSegment(t *testing.T) {
@@ -67,9 +64,7 @@ func TestWildcardZeroSegment(t *testing.T) {
 	})
 	_ = bus.Publish(context.Background(), "a", nil)
 	_ = bus.Publish(context.Background(), "a.b.c", nil)
-	if strings.Join(got, ",") != "a,a.b.c" {
-		t.Fatalf("零段通配符匹配不匹配：%v", got)
-	}
+	testx.RequireEqual(t, strings.Join(got, ","), "a,a.b.c")
 }
 
 func TestPriorityAndOrder(t *testing.T) {
@@ -88,9 +83,7 @@ func TestPriorityAndOrder(t *testing.T) {
 	_ = bus.Publish(context.Background(), "a.b", nil)
 	got := strings.Join(order, ",")
 	want := "通配-优先,精确-前,精确-后,通配-默认"
-	if got != want {
-		t.Fatalf("优先级/顺序不匹配：%q，期望 %q", got, want)
-	}
+	testx.RequireEqual(t, got, want)
 }
 
 func TestFilter(t *testing.T) {
@@ -109,9 +102,7 @@ func TestFilter(t *testing.T) {
 	for i := 1; i <= 4; i++ {
 		_ = bus.Publish(context.Background(), "t", i)
 	}
-	if len(got) != 6 {
-		t.Fatalf("过滤器命中不匹配：%v", got)
-	}
+	testx.RequireLen(t, got, 6)
 }
 
 func TestFilterPanic(t *testing.T) {
@@ -125,9 +116,7 @@ func TestFilterPanic(t *testing.T) {
 	})
 	err := bus.Publish(context.Background(), "t", nil)
 	assertErrCode(t, err, CodeHandlerPanic)
-	if called {
-		t.Fatal("过滤器 panic 后不应调用 handler")
-	}
+	testx.RequireFalse(t, called)
 }
 
 func TestWildcardAsync(t *testing.T) {
@@ -137,15 +126,11 @@ func TestWildcardAsync(t *testing.T) {
 		done <- e.Topic
 		return nil
 	})
-	if err := bus.PublishAsync(context.Background(), "orders.a.b", nil); err != nil {
-		t.Fatalf("PublishAsync 失败：%v", err)
-	}
+	testx.RequireNoError(t, bus.PublishAsync(context.Background(), "orders.a.b", nil))
 	_ = bus.Close()
 	select {
 	case got := <-done:
-		if got != "orders.a.b" {
-			t.Fatalf("异步通配符命中不匹配：%q", got)
-		}
+		testx.RequireEqual(t, got, "orders.a.b")
 	default:
 		t.Fatal("异步通配符订阅未命中")
 	}
@@ -158,16 +143,10 @@ func TestWildcardUnsubscribe(t *testing.T) {
 		count++
 		return nil
 	})
-	if err := sub.Unsubscribe(); err != nil {
-		t.Fatalf("Unsubscribe 失败：%v", err)
-	}
-	if err := sub.Unsubscribe(); err != nil {
-		t.Fatalf("重复 Unsubscribe 应幂等：%v", err)
-	}
+	testx.RequireNoError(t, sub.Unsubscribe())
+	testx.RequireNoError(t, sub.Unsubscribe())
 	_ = bus.Publish(context.Background(), "orders.created", nil)
-	if count != 0 {
-		t.Fatalf("取消后通配订阅不应命中：%d", count)
-	}
+	testx.RequireEqual(t, count, 0)
 }
 
 func TestWildcardUnsubscribeAfterClose(t *testing.T) {

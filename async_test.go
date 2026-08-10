@@ -3,6 +3,7 @@ package eventx
 import (
 	"context"
 	"errors"
+	"github.com/lcylpzls/testx"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -147,9 +148,7 @@ func TestNewInvalidOptions(t *testing.T) {
 
 func TestNewNilOption(t *testing.T) {
 	bus, err := New(nil)
-	if err != nil {
-		t.Fatalf("nil 选项应安全跳过：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	_ = bus
 }
 

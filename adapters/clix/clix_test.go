@@ -8,13 +8,12 @@ import (
 
 	"github.com/lcylpzls/clix"
 	"github.com/lcylpzls/eventx"
+	"github.com/lcylpzls/testx"
 )
 
 func TestObserverForwards(t *testing.T) {
 	bus, err := eventx.New()
-	if err != nil {
-		t.Fatalf("New 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	started := make(chan CommandEvent, 1)
 	finished := make(chan CommandEvent, 1)
 	_, _ = bus.Subscribe("clix.command.start", func(ctx context.Context, e eventx.Event) error {

@@ -6,13 +6,12 @@ import (
 
 	"github.com/lcylpzls/eventx"
 	"github.com/lcylpzls/jobx"
+	"github.com/lcylpzls/testx"
 )
 
 func TestHookForwards(t *testing.T) {
 	bus, err := eventx.New()
-	if err != nil {
-		t.Fatalf("New 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	got := make(chan jobx.TaskEvent, 1)
 	_, _ = bus.Subscribe("jobx.task.completed", func(ctx context.Context, e eventx.Event) error {
 		got <- e.Payload.(jobx.TaskEvent)

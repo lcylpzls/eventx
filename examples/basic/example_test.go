@@ -5,21 +5,18 @@ import (
 	"testing"
 
 	"github.com/lcylpzls/eventx"
+	"github.com/lcylpzls/testx"
 )
 
 func TestExamplePubSub(t *testing.T) {
 	bus, err := eventx.New()
-	if err != nil {
-		t.Fatalf("New 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	var got any
 	sub, err := bus.Subscribe("orders.created", func(ctx context.Context, e eventx.Event) error {
 		got = e.Payload
 		return nil
 	})
-	if err != nil {
-		t.Fatalf("Subscribe 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	defer sub.Unsubscribe()
 	if err := bus.Publish(context.Background(), "orders.created", "10086"); err != nil {
 		t.Fatalf("Publish 失败：%v", err)
@@ -36,15 +33,11 @@ func TestExamplePubSub(t *testing.T) {
 	}, func(ctx context.Context, e eventx.Event) error {
 		return nil
 	})
-	if err != nil {
-		t.Fatalf("SubscribeFiltered 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	_, err = eventx.SubscribeTyped[int](bus, "orders.count", func(ctx context.Context, topic string, payload int) error {
 		return nil
 	})
-	if err != nil {
-		t.Fatalf("SubscribeTyped 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	m := bus.Metrics()
 	if m.Publishes == 0 {
 		t.Fatal("指标应记录发布次数")

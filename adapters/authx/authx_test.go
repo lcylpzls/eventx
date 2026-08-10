@@ -7,13 +7,12 @@ import (
 
 	"github.com/lcylpzls/authx"
 	"github.com/lcylpzls/eventx"
+	"github.com/lcylpzls/testx"
 )
 
 func TestHookForwards(t *testing.T) {
 	bus, err := eventx.New()
-	if err != nil {
-		t.Fatalf("New 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	got := make(chan authx.AuthEvent, 1)
 	_, _ = bus.Subscribe("authx.token.issue", func(ctx context.Context, e eventx.Event) error {
 		got <- e.Payload.(authx.AuthEvent)

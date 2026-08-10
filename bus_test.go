@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/lcylpzls/errx"
+	"github.com/lcylpzls/testx"
 )
 
 func TestPublishBasic(t *testing.T) {
@@ -17,9 +18,7 @@ func TestPublishBasic(t *testing.T) {
 		got = e
 		return nil
 	})
-	if err != nil {
-		t.Fatalf("Subscribe 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	if sub.ID() == 0 || sub.Topic() != "orders.created" {
 		t.Fatalf("订阅访问器不匹配：id=%d topic=%q", sub.ID(), sub.Topic())
 	}
@@ -243,9 +242,7 @@ func TestZeroValueBus(t *testing.T) {
 func newBus(t *testing.T, opts ...Option) *Bus {
 	t.Helper()
 	bus, err := New(opts...)
-	if err != nil {
-		t.Fatalf("New 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	return bus
 }
 

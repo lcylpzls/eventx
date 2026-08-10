@@ -2,6 +2,7 @@ package eventx
 
 import (
 	"context"
+	"github.com/lcylpzls/testx"
 	"testing"
 	"time"
 )
@@ -20,9 +21,7 @@ func TestSubscribeTyped(t *testing.T) {
 		got <- payload
 		return nil
 	})
-	if err != nil {
-		t.Fatalf("SubscribeTyped 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	defer sub.Unsubscribe()
 	if err := bus.Publish(context.Background(), "orders.created", orderEvent{ID: "10086"}); err != nil {
 		t.Fatalf("Publish 失败：%v", err)

@@ -13,27 +13,22 @@ import (
 	jobxadapter "github.com/lcylpzls/eventx/adapters/jobx"
 	"github.com/lcylpzls/filex"
 	"github.com/lcylpzls/jobx"
+	"github.com/lcylpzls/testx"
 )
 
 // TestEcosystemLink 端到端联动：
 // filex 上传 → eventx 事件 → cachex 失效 + jobx 异步处理。
 func TestEcosystemLink(t *testing.T) {
 	bus, err := eventx.New()
-	if err != nil {
-		t.Fatalf("New 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	defer bus.Close()
 
 	cache, err := cachex.New(cachex.WithEventHook(cachexadapter.Hook(bus)))
-	if err != nil {
-		t.Fatalf("cachex.New 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	defer cache.Close()
 
 	dispatcher, err := jobx.NewDispatcher(jobx.WithEventHook(jobxadapter.Hook(bus)))
-	if err != nil {
-		t.Fatalf("jobx.NewDispatcher 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	defer dispatcher.Shutdown(context.Background())
 	if err := dispatcher.Handle("thumbnail", func(ctx context.Context, job jobx.Job) error {
 		return nil
@@ -45,9 +40,7 @@ func TestEcosystemLink(t *testing.T) {
 		DataDir:   t.TempDir(),
 		EventHook: filexadapter.Hook(bus),
 	})
-	if err != nil {
-		t.Fatalf("filex.New 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	defer store.Close()
 	if _, err := store.CreateBucket(context.Background(), "bucket"); err != nil {
 		t.Fatalf("CreateBucket 失败：%v", err)
@@ -60,17 +53,13 @@ func TestEcosystemLink(t *testing.T) {
 			_, err := dispatcher.Submit(ctx, "thumbnail", []byte(e.Bucket+"/"+e.Key))
 			return err
 		})
-	if err != nil {
-		t.Fatalf("SubscribeTyped 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 	jobDone := make(chan struct{}, 1)
 	_, err = bus.Subscribe("jobx.task.completed", func(ctx context.Context, e eventx.Event) error {
 		jobDone <- struct{}{}
 		return nil
 	})
-	if err != nil {
-		t.Fatalf("Subscribe 失败：%v", err)
-	}
+	testx.RequireNoError(t, err)
 
 	// 预置缓存值，上传对象后应被事件联动清除。
 	cache.Set("bucket/k", "旧值")
