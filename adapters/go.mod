@@ -6,11 +6,11 @@ require (
 	github.com/lcylpzls/authx v1.8.0
 	github.com/lcylpzls/cachex v1.3.0
 	github.com/lcylpzls/clix v1.4.0
-	github.com/lcylpzls/dbx v0.6.0
-	github.com/lcylpzls/eventx v0.8.0
-	github.com/lcylpzls/filex v0.28.0
+	github.com/lcylpzls/dbx v1.0.0
+	github.com/lcylpzls/eventx v1.0.0
+	github.com/lcylpzls/filex v1.0.0
 	github.com/lcylpzls/jobx v1.5.0
-	github.com/lcylpzls/testx v1.4.0
+	github.com/lcylpzls/testx v1.4.1
 )
 
 require (
