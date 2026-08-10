@@ -3,6 +3,7 @@ module github.com/lcylpzls/eventx/adapters
 go 1.26.5
 
 require (
+	github.com/lcylpzls/authx v1.5.0
 	github.com/lcylpzls/cachex v1.2.0
 	github.com/lcylpzls/clix v1.3.0
 	github.com/lcylpzls/dbx v0.5.0

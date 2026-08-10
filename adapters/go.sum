@@ -3,6 +3,8 @@ github.com/BurntSushi/toml v1.6.0/go.mod h1:ukJfTF/6rtPPRCnwkur4qwRxa8vTRFBF0uk2
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/lcylpzls/authx v1.5.0 h1:36F/BWMJ4LJRCtrMFBvneYF2DvhmvqH94Syum88FfNw=
+github.com/lcylpzls/authx v1.5.0/go.mod h1:4xmgwxP3RR0y/fWwRDObGqYAcOvLx0E0FeO8vMQi8tw=
 github.com/lcylpzls/cachex v1.2.0 h1:6ey6/198FaHeAFOqg++MlEa8F2h0RNtnF/LKfbQXzNU=
 github.com/lcylpzls/cachex v1.2.0/go.mod h1:fGJlU7OE/D23JuR75KeEqrplDxqBOA8FPZ41An2dhdA=
 github.com/lcylpzls/clix v1.3.0 h1:O34pn+EOBIG3d+7qvw/ehDeT2otrYDh29wdwhFGzhi8=

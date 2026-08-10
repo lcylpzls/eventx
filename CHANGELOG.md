@@ -1,5 +1,12 @@
 # 更新日志
 
+## [v0.7.2] - 2026-08-10
+
+### 新增
+
+- `eventx/adapters/authx`：authx.EventHook 适配器，
+  令牌操作发布为 `authx.token.<action>` 事件。
+
 ## [v0.7.1] - 2026-08-10
 
 ### 新增
