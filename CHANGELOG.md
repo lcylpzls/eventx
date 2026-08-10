@@ -1,5 +1,19 @@
 # 更新日志
 
+## [v0.8.0] - 2026-08-10
+
+### 变更
+
+- 主题校验统一迁移至家族 `validx`：发布/订阅主题注册为
+  `eventx_topic` 全局规则（参数区分 publish/subscribe），
+  调用点走 `validx.ValidateField`；
+- errx 错误码保持 `CodeInvalidTopic` 语义，行为不变。
+
+### 质量
+
+- 根包语句覆盖率保持 100%；race / vet / staticcheck / fuzz /
+  govulncheck 全绿。
+
 ## [v0.7.2] - 2026-08-10
 
 ### 新增
