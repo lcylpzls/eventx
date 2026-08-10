@@ -1,5 +1,19 @@
 # 更新日志
 
+## [v0.6.0] - 2026-08-10
+
+### 新增
+
+- `docs/errors.md` 错误码手册（9 个错误码）；
+- `docs/adapters.md` 家族接入规范：EventHook 零依赖钩子 +
+  `eventx/adapters` 适配器 + 项目层组装；
+- `docs/final-review.md` 1.0 候选终审清单；
+- Issue 模板与 README CI 徽章/状态行。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.5.0] - 2026-08-10
 
 ### 新增

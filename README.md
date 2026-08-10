@@ -5,6 +5,7 @@
 
 [![Go Version](https://img.shields.io/badge/Go-%3E%3D1.26-00ADD8?style=flat&logo=go)](https://go.dev/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![CI](https://github.com/lcylpzls/eventx/actions/workflows/ci.yml/badge.svg)](https://github.com/lcylpzls/eventx/actions/workflows/ci.yml)
 
 ## 快速开始
 
@@ -44,12 +45,17 @@ func main() {
 - 可选 logx 审计与 Metrics 接口；
 - 并发安全、无全局单例。
 
+> 当前状态：**v0.6.x（1.0 候选）**；v1.0.0 是否发布由维护者决定。
+
 ## 文档
 
 - [docs/research.md](docs/research.md) — 调研与取舍
 - [docs/design.md](docs/design.md) — 设计
 - [docs/architecture.md](docs/architecture.md) — 架构
 - [docs/api.md](docs/api.md) — API 快照
+- [docs/errors.md](docs/errors.md) — 错误码手册
+- [docs/adapters.md](docs/adapters.md) — 家族接入规范
+- [docs/final-review.md](docs/final-review.md) — 1.0 候选终审
 - [docs/roadmap.md](docs/roadmap.md) — 路线图
 
 ## License
