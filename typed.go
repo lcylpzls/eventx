@@ -12,6 +12,9 @@ type TypedHandler[T any] func(ctx context.Context, topic string, payload T) erro
 // SubscribeTyped 订阅类型化事件：发布载荷类型不匹配时返回
 // EVENTX_TYPE_MISMATCH（该订阅者失败，不影响其他订阅者）。
 func SubscribeTyped[T any](b *Bus, topic string, handler TypedHandler[T]) (Subscription, error) {
+	if b == nil {
+		return nil, errx.NewCode(CodeInvalidOption, "总线不能为空")
+	}
 	if handler == nil {
 		return nil, errx.NewCode(CodeInvalidHandler, "类型化订阅处理函数不能为空")
 	}

@@ -168,6 +168,18 @@ func TestPublishNoSubscriber(t *testing.T) {
 	}
 }
 
+func TestPublishNilContext(t *testing.T) {
+	bus := newBus(t)
+	var nilCtx context.Context
+	if err := bus.Publish(nilCtx, "t", nil); err != nil {
+		t.Fatalf("nil context 发布应安全：%v", err)
+	}
+	if err := bus.PublishAsync(nilCtx, "t", nil); err != nil {
+		t.Fatalf("nil context 异步发布应安全：%v", err)
+	}
+	_ = bus.Close()
+}
+
 func TestPublishSkipsUnsubscribedInFlight(t *testing.T) {
 	bus := newBus(t)
 	sub := &subscription{

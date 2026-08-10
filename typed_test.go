@@ -43,6 +43,13 @@ func TestSubscribeTypedNilHandler(t *testing.T) {
 	assertErrCode(t, err, CodeInvalidHandler)
 }
 
+func TestSubscribeTypedNilBus(t *testing.T) {
+	_, err := SubscribeTyped[int](nil, "t", func(ctx context.Context, topic string, payload int) error {
+		return nil
+	})
+	assertErrCode(t, err, CodeInvalidOption)
+}
+
 func TestSubscribeTypedMismatch(t *testing.T) {
 	bus := newBus(t)
 	otherCalled := false

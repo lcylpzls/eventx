@@ -1,5 +1,16 @@
 # 更新日志
 
+## [v0.6.1] - 2026-08-10
+
+### 修复
+
+- `Publish` / `PublishAsync` 对 nil context 归一为 Background，不再 panic；
+- `SubscribeTyped` 对 nil 总线返回 `EVENTX_INVALID_OPTION`。
+
+### 质量
+
+- 根包语句覆盖率 100%；race / vet / staticcheck / fuzz / govulncheck 全绿。
+
 ## [v0.6.0] - 2026-08-10
 
 ### 新增

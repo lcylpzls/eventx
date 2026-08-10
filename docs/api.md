@@ -1,8 +1,8 @@
 # API 快照
 
-> 随版本更新。v0.5.0 快照如下；新版本发布后同步替换。
+> 随版本更新。v0.6.1 快照如下；新版本发布后同步替换。
 
-## v0.5.0
+## v0.6.1
 
 ### 类型
 
@@ -62,6 +62,7 @@ func SubscribeTyped[T any](b *Bus, topic string, handler TypedHandler[T]) (Subsc
 
 - 发布入口与分发循环都响应 context 取消：取消时返回
   `EVENTX_CANCELLED`，剩余订阅者不再执行；
+- nil context 归一为 context.Background()；
 - `SubscribeTyped` 自动断言载荷类型，不匹配返回
   `EVENTX_TYPE_MISMATCH`（不影响其他订阅者）；
 - 类型化订阅处理函数为 nil 时返回 `EVENTX_INVALID_HANDLER`。

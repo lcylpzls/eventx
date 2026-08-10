@@ -212,6 +212,7 @@ func (b *Bus) subscribe(topic string, handler Handler, cfg subscribeConfig) (Sub
 // Publish 同步发布事件：按优先级与注册顺序调用全部匹配 handler，
 // 聚合所有返回的错误（errx.Join）后返回。
 func (b *Bus) Publish(ctx context.Context, topic string, payload any) error {
+	ctx = ensureContext(ctx)
 	if err := validatePublishTopic(topic); err != nil {
 		return err
 	}
@@ -223,6 +224,14 @@ func (b *Bus) Publish(ctx context.Context, topic string, payload any) error {
 	}
 	b.publishes.Add(1)
 	return deliver(b, ctx, topic, payload, b.snapshot(topic))
+}
+
+// ensureContext 将 nil context 归一为 context.Background()。
+func ensureContext(ctx context.Context) context.Context {
+	if ctx == nil {
+		return context.Background()
+	}
+	return ctx
 }
 
 // Close 关闭总线：拒绝新发布/订阅，排空异步在途任务后清空订阅。
