@@ -1,7 +1,7 @@
 github.com/lcylpzls/errx v1.5.7 h1:xG8/Czb1WOyQo2Q9maeZs0XhUwiSJZmXp2NgrKV0994=
 github.com/lcylpzls/errx v1.5.7/go.mod h1:ialPRwTF+qXrLenZS8UvVdJMiXehvzGdDp7Sz3R25rg=
-github.com/lcylpzls/logx v1.3.4 h1:SY0MOst90+fwxqpAMJvln46OHQwu7u1MEh7jkzsgJmA=
-github.com/lcylpzls/logx v1.3.4/go.mod h1:yuwucAdbDdExex5jEiiYaXqBNUku37skHloJRy0x/aw=
+github.com/lcylpzls/logx v1.4.0 h1:QJsres3kq6lv5IM2V8GbZUw/N4QHi8YBLJhiBOmONR8=
+github.com/lcylpzls/logx v1.4.0/go.mod h1:yuwucAdbDdExex5jEiiYaXqBNUku37skHloJRy0x/aw=
 github.com/lcylpzls/testx v1.4.5 h1:y4zvTQErVpAd1sKzev2p2yu5Q84jHk+GNoRmjWAGkSY=
 github.com/lcylpzls/testx v1.4.5/go.mod h1:kzSdyHDmf8MY/rRQK5Qhh3eeJ2ZabQ/lrxdBPKud0y8=
 github.com/lcylpzls/validx v1.2.5 h1:UrZeg86yOeazf+CtCpE2L3CgUwOqN/9JfX0vacLVAfA=

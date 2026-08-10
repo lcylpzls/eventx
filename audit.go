@@ -2,8 +2,6 @@ package eventx
 
 import (
 	"time"
-
-	errxlogx "github.com/lcylpzls/errx/logx"
 	"github.com/lcylpzls/logx"
 )
 
@@ -18,7 +16,7 @@ func auditFields(topic string, subscribers int, start time.Time, err error) logx
 		),
 	}
 	if err != nil {
-		groups = append(groups, errxlogx.Fields(err))
+		groups = append(groups, logx.FieldsFromError(err))
 	}
 	var fs []logx.Field
 	for _, g := range groups {
