@@ -8,6 +8,7 @@ require (
 	github.com/lcylpzls/eventx/adapters v0.3.1
 	github.com/lcylpzls/filex v0.26.0
 	github.com/lcylpzls/jobx v1.3.0
+	github.com/lcylpzls/testx v1.2.3
 )
 
 require (
