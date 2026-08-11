@@ -45,34 +45,18 @@ func main() {
 - 可选 logx 审计与 Metrics 接口；
 - 并发安全、无全局单例。
 
-## 家族联动（eventx/adapters）
+## 家族联动
 
-```go
-import (
-	filexadapter "github.com/lcylpzls/eventx/adapters/filex"
-	cachexadapter "github.com/lcylpzls/eventx/adapters/cachex"
-	jobxadapter "github.com/lcylpzls/eventx/adapters/jobx"
-)
+各家族库通过事件钩子（如 `WithEventHook`）把事件转发到 eventx 总线；
+钩子实现由使用方在项目层内联完成（事件桥通常只有几行），
+完整示例见 `examples/ecosystem`。
 
-store, _ := filex.New(filex.Config{DataDir: "/data", EventHook: filexadapter.Hook(bus)})
-cache, _ := cachex.New(cachex.WithEventHook(cachexadapter.Hook(bus)))
-dispatcher, _ := jobx.NewDispatcher(jobx.WithEventHook(jobxadapter.Hook(bus)))
-```
-
-项目层订阅组装联动；示例见 `examples/ecosystem`。
-
-> 当前状态：**v0.6.x（1.0 候选）**；v1.0.0 是否发布由维护者决定。
+> 当前状态：**v1.2.1**。
 
 ## 文档
 
-- [docs/research.md](docs/research.md) — 调研与取舍
-- [docs/design.md](docs/design.md) — 设计
 - [docs/architecture.md](docs/architecture.md) — 架构
-- [docs/api.md](docs/api.md) — API 快照
 - [docs/errors.md](docs/errors.md) — 错误码手册
-- [docs/adapters.md](docs/adapters.md) — 家族接入规范
-- [docs/final-review.md](docs/final-review.md) — 1.0 候选终审
-- [docs/roadmap.md](docs/roadmap.md) — 路线图
 
 ## License
 

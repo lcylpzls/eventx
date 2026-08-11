@@ -11,7 +11,6 @@ eventx（根包）
 ├── match.go       过滤器与优先级排序（v0.3.0）
 ├── typed.go       上下文贯穿与类型化订阅（v0.4.0）
 ├── audit.go       logx 审计字段与 Metrics（v0.5.0）
-└── adapters/      家族库适配器规范与示例（v0.6.0 起）
 ```
 
 依赖方向：
@@ -31,6 +30,5 @@ audit.go ──→ typed.go ──→ bus.go ──→ topic.go ──→ errors
 
 ## 3. 后续演进扩展点
 
-- `eventx/adapters/*`：filex/dbx/authx 等家族库的事件钩子适配；
 - 中间件链：发布前/后钩子（按需）；
 - 分布式形态：独立 mqx 评估，不在 eventx 内实现。
