@@ -8,13 +8,37 @@ import (
 
 	"github.com/lcylpzls/cachex"
 	"github.com/lcylpzls/eventx"
-	cachexadapter "github.com/lcylpzls/eventx/adapters/cachex"
-	filexadapter "github.com/lcylpzls/eventx/adapters/filex"
-	jobxadapter "github.com/lcylpzls/eventx/adapters/jobx"
 	"github.com/lcylpzls/filex"
 	"github.com/lcylpzls/jobx"
 	"github.com/lcylpzls/testx"
 )
+
+// cachexBridge 将 cachex 事件转发到 eventx 总线（原 adapters 子模块的内联实现）。
+type cachexBridge struct {
+	bus *eventx.Bus
+}
+
+func (b cachexBridge) OnCacheEvent(ctx context.Context, e cachex.CacheEvent) {
+	_ = b.bus.Publish(ctx, "cachex."+e.Action, e)
+}
+
+// jobxBridge 将 jobx 事件转发到 eventx 总线。
+type jobxBridge struct {
+	bus *eventx.Bus
+}
+
+func (b jobxBridge) OnTaskEvent(ctx context.Context, e jobx.TaskEvent) {
+	_ = b.bus.Publish(ctx, "jobx.task."+e.Action, e)
+}
+
+// filexBridge 将 filex 事件转发到 eventx 总线。
+type filexBridge struct {
+	bus *eventx.Bus
+}
+
+func (b filexBridge) OnObjectEvent(ctx context.Context, e filex.ObjectEvent) {
+	_ = b.bus.Publish(ctx, "filex.object."+e.Action, e)
+}
 
 // TestEcosystemLink 端到端联动：
 // filex 上传 → eventx 事件 → cachex 失效 + jobx 异步处理。
@@ -23,11 +47,11 @@ func TestEcosystemLink(t *testing.T) {
 	testx.RequireNoError(t, err)
 	defer bus.Close()
 
-	cache, err := cachex.New(cachex.WithEventHook(cachexadapter.Hook(bus)))
+	cache, err := cachex.New(cachex.WithEventHook(cachexBridge{bus}))
 	testx.RequireNoError(t, err)
 	defer cache.Close()
 
-	dispatcher, err := jobx.NewDispatcher(jobx.WithEventHook(jobxadapter.Hook(bus)))
+	dispatcher, err := jobx.NewDispatcher(jobx.WithEventHook(jobxBridge{bus}))
 	testx.RequireNoError(t, err)
 	defer dispatcher.Shutdown(context.Background())
 	if err := dispatcher.Handle("thumbnail", func(ctx context.Context, job jobx.Job) error {
@@ -38,7 +62,7 @@ func TestEcosystemLink(t *testing.T) {
 
 	store, err := filex.New(filex.Config{
 		DataDir:   t.TempDir(),
-		EventHook: filexadapter.Hook(bus),
+		EventHook: filexBridge{bus},
 	})
 	testx.RequireNoError(t, err)
 	defer store.Close()

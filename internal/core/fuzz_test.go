@@ -1,4 +1,4 @@
-package eventx
+package core
 
 import (
 	"testing"

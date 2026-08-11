@@ -1,8 +1,8 @@
-package eventx
+package core
 
 import (
-	"time"
 	"github.com/lcylpzls/logx"
+	"time"
 )
 
 // auditFields 生成事件分发审计字段：主题、订阅者数、耗时与错误码，
